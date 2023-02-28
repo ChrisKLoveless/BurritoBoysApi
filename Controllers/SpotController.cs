@@ -58,19 +58,35 @@ namespace BurritoBoysApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Spot>> Put(int id, Spot newSpot)
+        public async Task<IActionResult> Put(int id, Spot spot)
         {
-            Spot thisSpot = await _db.Spots
-                .FirstOrDefaultAsync(spot => spot.SpotId == id);
-            if (thisSpot == null)
+            if (id != spot.SpotId)
             {
-                return NotFound();
+                return BadRequest();
             }
-            Spot updateSpot = newSpot;
-            updateSpot.SpotId = id;
-            _db.Spots.Update(updateSpot);
-            await _db.SaveChangesAsync();
-            return Ok();
+            _db.Spots.Update(spot);
+
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SpotExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return NoContent();
+        }
+
+        private bool SpotExists(int id)
+        {
+            return _db.Spots.Any(e => e.SpotId == id);
         }
 
         [HttpDelete("{id}")]
