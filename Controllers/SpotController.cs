@@ -52,10 +52,10 @@ namespace BurritoBoysApi.Controllers
         [HttpGet("gettop/{amount}")]
         public async Task<ActionResult<IEnumerable<Spot>>> GetTop(int amount)
         {
-            List<Spot> spots = _db.Spots
+            List<Spot> spots = await _db.Spots
                 .OrderByDescending(spot => spot.AverageRating)
                 .Take(amount)
-                .ToList();
+                .ToListAsync();
             return spots;
         }
 
