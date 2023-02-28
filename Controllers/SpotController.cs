@@ -62,6 +62,10 @@ namespace BurritoBoysApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Spot>> Post(Spot spot)
         {
+            if (spot.Ratings != null || spot.Salsas != null)
+            {
+                return BadRequest();
+            }
             _db.Spots.Add(spot);
             await _db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSpot), new { id = spot.SpotId }, spot);
