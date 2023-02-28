@@ -49,6 +49,16 @@ namespace BurritoBoysApi.Controllers
                                 .Include(spot => spot.Salsas).ToListAsync();
         }
 
+        [HttpGet("gettop/{amount}")]
+        public async Task<ActionResult<IEnumerable<Spot>>> GetTop(int amount)
+        {
+            List<Spot> spots = _db.Spots
+                .OrderByDescending(spot => spot.AverageRating)
+                .Take(amount)
+                .ToList();
+            return spots;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Spot>> Post(Spot spot)
         {

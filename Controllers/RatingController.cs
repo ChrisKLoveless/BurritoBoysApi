@@ -28,14 +28,11 @@ namespace BurritoBoysApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Rating>>> Get(string rate)
+        public async Task<ActionResult<IEnumerable<Rating>>> Get()
         {
             IQueryable<Rating> query = _db.Ratings.AsQueryable();
 
-            if (rate != null)
-            {
-                query = query.Where(rating => rating.Rate == rate);
-            }
+            // query.OrderByDescending(rating => rating.Rate);
 
             return await query.ToListAsync();
         }
@@ -44,8 +41,41 @@ namespace BurritoBoysApi.Controllers
         public async Task<ActionResult<Rating>> Post(Rating rating)
         {
             _db.Ratings.Add(rating);
-            await _db.SaveChangesAsync();
+
+            List<Rating> ratings = _db.Ratings.Where(rate => rate.SpotId == rating.SpotId).ToList();
+            ratings.Add(rating);
+            double average = 0;
+            ratings.ForEach(rate => {
+                average += rate.Rate;
+            });
+            average = average / (double)ratings.Count();
+            Console.WriteLine(average);
+
+            Spot spot = await _db.Spots.FirstOrDefaultAsync(spot => spot.SpotId == rating.SpotId);
+            spot.AverageRating = average;
+            _db.Spots.Update(spot);
+            try
+            {
+                await _db.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SpotExists(spot.SpotId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        
             return CreatedAtAction(nameof(GetRating), new { id = rating.RatingId }, rating);
+        }
+
+        private bool SpotExists(int id)
+        {
+            return _db.Spots.Any(e => e.SpotId == id);
         }
 
         [HttpPut("{id}")]
