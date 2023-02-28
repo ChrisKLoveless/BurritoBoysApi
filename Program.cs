@@ -1,6 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using BurritoBoysApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddDbContext<BurritoBoysApiContext>(
+                  dbContextOptions => dbContextOptions
+                    .UseMySql(
+                      builder.Configuration["ConnectionStrings:DefaultConnection"], 
+                      ServerVersion.AutoDetect(builder.Configuration["ConnectionStrings:DefaultConnection"]
+                    )
+                  )
+                );
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

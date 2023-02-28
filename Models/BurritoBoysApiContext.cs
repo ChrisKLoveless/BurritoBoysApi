@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BurritoBoysApi.Models
 {
   public class BurritoBoysApiContext : DbContext
