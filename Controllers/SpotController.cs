@@ -56,5 +56,35 @@ namespace BurritoBoysApi.Controllers
             await _db.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSpot), new { id = spot.SpotId }, spot);
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Spot>> Put(int id, Spot newSpot)
+        {
+            Spot thisSpot = await _db.Spots
+                .FirstOrDefaultAsync(spot => spot.SpotId == id);
+            if (thisSpot == null)
+            {
+                return NotFound();
+            }
+            Spot updateSpot = newSpot;
+            updateSpot.SpotId = id;
+            _db.Spots.Update(updateSpot);
+            await _db.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            Spot thisSpot = await _db.Spots
+                .FirstOrDefaultAsync(spot => spot.SpotId == id);
+            if (thisSpot == null)
+            {
+                return NotFound();
+            }
+            _db.Spots.Remove(thisSpot);
+            await _db.SaveChangesAsync();
+            return Ok();
+        }
     }
 }
