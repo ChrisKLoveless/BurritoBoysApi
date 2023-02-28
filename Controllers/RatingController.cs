@@ -32,14 +32,21 @@ namespace BurritoBoysApi.Controllers
         {
             IQueryable<Rating> query = _db.Ratings.AsQueryable();
 
-            // query.OrderByDescending(rating => rating.Rate);
-
             return await query.ToListAsync();
         }
 
         [HttpPost]
         public async Task<ActionResult<Rating>> Post(Rating rating)
         {
+            if (rating.Rate < 0 || rating.Rate > 5)
+            {
+                return BadRequest(new Error
+                {
+                    Code = "400",
+                    Description = "BAD_REQUEST : rate can only be a number between 0 and 5."
+                });
+            }
+
             _db.Ratings.Add(rating);
 
             List<Rating> ratings = _db.Ratings.Where(rate => rate.SpotId == rating.SpotId).ToList();
@@ -83,7 +90,11 @@ namespace BurritoBoysApi.Controllers
         {
             if (id != rating.RatingId)
             {
-                return BadRequest();
+                return BadRequest(new Error
+                {
+                    Code = "400",
+                    Description = "BAD_REQUEST : id passed does not match RatingId in updated rating."
+                });
             }
             _db.Ratings.Update(rating);
 

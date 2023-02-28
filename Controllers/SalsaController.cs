@@ -53,7 +53,11 @@ namespace BurritoBoysApi.Controllers
         {
             if (id != salsa.SalsaId)
             {
-                return BadRequest();
+                return BadRequest(new Error
+                {
+                    Code = "400",
+                    Description = "BAD_REQUEST : id passed does not match SalsaId in updated salsa."
+                });
             }
             _db.Salsas.Update(salsa);
 

@@ -64,7 +64,11 @@ namespace BurritoBoysApi.Controllers
         {
             if (spot.Ratings != null || spot.Salsas != null)
             {
-                return BadRequest();
+                return BadRequest(new Error
+                {
+                    Code = "400",
+                    Description = "BAD_REQUEST : spot cannot contain Ratings or Salsas properties upon creation."
+                });
             }
             _db.Spots.Add(spot);
             await _db.SaveChangesAsync();
@@ -76,7 +80,11 @@ namespace BurritoBoysApi.Controllers
         {
             if (id != spot.SpotId)
             {
-                return BadRequest();
+                return BadRequest(new Error
+                {
+                    Code = "400",
+                    Description = "BAD_REQUEST : id passed does not match SpotId in updated spot."
+                });
             }
             _db.Spots.Update(spot);
 
